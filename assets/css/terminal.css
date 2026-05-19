@@ -1,0 +1,437 @@
+/* terminal.css — feature-specific terminal styling */
+
+/* =========================================================
+   Root splash (ASCII art welcome)
+   ========================================================= */
+.splash-screen {
+  cursor: pointer;
+  text-align: center;
+}
+
+.ascii-art {
+  /* Galmuri lacks consistent metrics for box-drawing chars (╔═╗║),
+     which makes the figlet rows misalign. Use a guaranteed-monospace
+     stack here so all glyphs share the same advance width. */
+  font-family: "Menlo", "Consolas", "DejaVu Sans Mono", "Courier New", monospace;
+  color: var(--fg-bright);
+  text-shadow: var(--glow-strong);
+  font-size: clamp(10px, 2.8vw, 18px);
+  line-height: 1.05;
+  margin: 18px 0 8px;
+  white-space: pre;
+  display: inline-block;
+  text-align: left;
+  font-weight: bold;
+}
+
+.ascii-sparkle {
+  /* Same reason — sparkle line mixes spaces, dots, asterisks; keep monospace */
+  font-family: "Menlo", "Consolas", "DejaVu Sans Mono", "Courier New", monospace;
+  font-size: clamp(10px, 2.4vw, 14px);
+  line-height: 1.2;
+  white-space: pre;
+  margin: 4px 0;
+}
+
+.splash-tagline {
+  font-size: clamp(11px, 2.6vw, 14px);
+  margin: 18px 0 4px;
+  letter-spacing: 1px;
+  min-height: 1.5em;
+}
+
+.splash-sub {
+  font-size: clamp(10px, 2.2vw, 12px);
+  margin: 0 0 22px;
+  min-height: 1.4em;
+}
+
+.continue-prompt {
+  font-size: clamp(11px, 2.4vw, 13px);
+  color: var(--fg);
+  margin: 22px 0 6px;
+}
+
+.center {
+  text-align: center;
+}
+
+/* =========================================================
+   Boot / loading
+   ========================================================= */
+.boot-log {
+  white-space: pre-wrap;
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 12em;
+}
+
+.boot-log .ok {
+  color: var(--fg-bright);
+}
+
+.boot-log .err {
+  color: var(--error);
+  text-shadow: 0 0 4px rgba(255, 80, 80, 0.5);
+}
+
+.loading-bar {
+  font-size: 16px;
+  white-space: pre;
+  margin: 10px 0;
+}
+
+/* =========================================================
+   Number lookup — odometer + dial + tv-style layout
+   ========================================================= */
+
+/* Layout: mobile (default) = single column, controls then screen.
+   Desktop (≥ 760px) = two columns, screen on left, controls on right. */
+.tv-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.tv-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.tv-screen {
+  position: relative;
+  border: 2px solid var(--fg-dim);
+  background: rgba(0, 0, 0, 0.65);
+  padding: 18px 18px 22px;
+  min-height: 160px;
+  /* Subtle inset glow like a CRT bezel */
+  box-shadow:
+    inset 0 0 24px rgba(51, 255, 51, 0.08),
+    0 0 8px rgba(51, 255, 51, 0.25);
+  /* Soft rounded corners — like an old TV tube */
+  border-radius: 14px / 22px;
+}
+
+/* Tiny "screen-on" pinpoint dot in the corner */
+.tv-screen::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg-bright);
+  box-shadow: 0 0 6px var(--fg);
+}
+
+.tv-empty {
+  padding: 14px 4px;
+  line-height: 1.9;
+}
+
+@media (min-width: 760px) {
+  .tv-layout {
+    /* Screen takes the rest, dial column is fixed */
+    grid-template-columns: 1fr 260px;
+    align-items: start;
+    gap: 22px;
+  }
+  /* Visual order: screen on left, controls on right (overrides source order) */
+  .tv-screen   { grid-column: 1; grid-row: 1; }
+  .tv-controls { grid-column: 2; grid-row: 1; }
+
+  .tv-screen { min-height: 360px; padding: 22px; }
+}
+
+/* When two-column layout kicks in, allow the screen container to grow with
+   the page width — bump the outer .screen frame too. */
+@media (min-width: 760px) {
+  .screen { max-width: 960px; }
+}
+
+.dial-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+}
+
+/* --- Odometer --- */
+.odometer {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--fg-dim);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: var(--glow);
+}
+
+.digit-col {
+  width: 52px;
+  height: 78px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--fg-faint);
+  position: relative;
+}
+
+/* Subtle horizontal banding inside each digit window (vfd / lcd vibe) */
+.digit-col::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 0, 0, 0.4) 4px,
+    rgba(0, 0, 0, 0.4) 4px
+  );
+  pointer-events: none;
+}
+
+/* Thin gradient at top/bottom of each digit window — gives a "rolling drum" depth */
+.digit-col::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.65) 0, transparent 22%, transparent 78%, rgba(0,0,0,0.65) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.digit-strip {
+  font-family: var(--mono);
+  font-size: 56px;
+  font-weight: bold;
+  color: var(--fg-bright);
+  text-shadow: var(--glow-strong);
+  text-align: center;
+  line-height: 78px;
+  transition: transform 0.35s cubic-bezier(0.6, 0.05, 0.4, 1);
+  will-change: transform;
+}
+
+.digit-cell {
+  height: 78px;
+}
+
+/* --- Dial --- */
+.dial-wrap {
+  position: relative;
+}
+
+.dial {
+  width: 220px;
+  height: 220px;
+  cursor: grab;
+  touch-action: none; /* prevent browser pan/scroll while dragging */
+  user-select: none;
+  display: block;
+}
+
+.dial.dragging { cursor: grabbing; }
+
+.dial:focus-visible { outline: none; }
+.dial:focus-visible .dial-outer { stroke: var(--fg-bright); }
+
+.dial-outer {
+  fill: rgba(51, 255, 51, 0.025);
+  stroke: var(--fg);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 5px rgba(51, 255, 51, 0.5));
+}
+
+.dial-tick {
+  stroke: var(--fg-dim);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.dial-tick.major {
+  stroke: var(--fg);
+  stroke-width: 2.2;
+}
+
+.dial-inner {
+  fill: rgba(0, 0, 0, 0.7);
+  stroke: var(--fg-dim);
+  stroke-width: 1;
+}
+
+.dial-notch {
+  fill: var(--fg-bright);
+  filter: drop-shadow(0 0 6px var(--fg));
+}
+
+.dial-rotator {
+  transform-origin: 0 0;
+  /* short ease so each tick "clicks" without being instant — feels mechanical */
+  transition: transform 0.08s cubic-bezier(0.4, 0.05, 0.4, 1);
+  will-change: transform;
+}
+
+.center-actions {
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- Icon-only buttons (◀ ● ▶  ★) ---
+   Borderless: just the glyph with a green glow. Hover/active states use
+   scale + brightness, so the buttons feel like glowing keys rather than
+   boxed widgets. */
+.nav-cluster {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  text-shadow: var(--glow);
+  cursor: pointer;
+  transition: transform 0.12s ease-out, color 0.15s, text-shadow 0.15s;
+}
+
+/* Override common.css button hover so it doesn't put a green tint behind */
+.btn-icon:hover:not(:disabled),
+.btn-icon:focus-visible {
+  background: transparent;
+  color: var(--fg-bright);
+  text-shadow: var(--glow-strong);
+  transform: scale(1.18);
+}
+
+.btn-icon:active:not(:disabled) {
+  background: transparent;
+  transform: scale(0.9);
+}
+
+.btn-icon:focus-visible {
+  outline: 1px dashed var(--fg-dim);
+  outline-offset: 6px;
+  box-shadow: none;
+}
+
+/* Random sits a little apart from the nav cluster */
+.btn-random {
+  margin-left: 22px;
+  font-size: 22px;
+}
+
+/* Mobile sizing tweaks */
+@media (max-width: 480px) {
+  .digit-col { width: 44px; height: 66px; }
+  .digit-strip { font-size: 46px; line-height: 66px; }
+  .digit-cell { height: 66px; }
+  .dial { width: 200px; height: 200px; }
+}
+
+@media (max-width: 360px) {
+  .digit-col { width: 38px; height: 58px; }
+  .digit-strip { font-size: 40px; line-height: 58px; }
+  .digit-cell { height: 58px; }
+  .dial { width: 180px; height: 180px; }
+}
+
+.result-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--fg-dim);
+  background: rgba(51, 255, 51, 0.03);
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg-dim) transparent;
+}
+
+.result-box::-webkit-scrollbar {
+  width: 8px;
+}
+.result-box::-webkit-scrollbar-thumb {
+  background: var(--fg-dim);
+}
+.result-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.result-header {
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-bottom: 10px;
+  border-bottom: 1px dashed var(--fg-dim);
+  padding-bottom: 6px;
+}
+
+.result-body {
+  font-size: 15px;
+  line-height: 1.8;
+  word-break: keep-all;
+  white-space: pre-wrap;
+}
+
+/* Narration / stage direction (was *…* in source) — render faded */
+.result-body .narration {
+  color: var(--fg-dim);
+  text-shadow: 0 0 3px rgba(51, 255, 51, 0.25);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.actions .grow {
+  flex: 1 1 auto;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--fg-faint);
+  margin-top: 6px;
+}
+
+/* =========================================================
+   Toast (error / info)
+   ========================================================= */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-soft);
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 10px 14px;
+  font-size: 13px;
+  z-index: 10000;
+  text-shadow: 0 0 4px rgba(255, 80, 80, 0.5);
+  max-width: 90vw;
+}
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .result-body { font-size: 14px; line-height: 1.75; }
+  .number-prompt { flex-wrap: wrap; }
+  .number-prompt input[type="number"] { flex: 1 1 100%; }
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>v1.0.0</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
+    <link rel="stylesheet" href="./assets/css/common.css" />
+    <link rel="stylesheet" href="./assets/css/terminal.css" />
+  </head>
+  <body>
+    <div class="viewport">
+      <main class="screen splash-screen" role="main">
+        <header class="screen-header">
+          <span>limbic-system / boot</span>
+          <span class="dim" id="clock">--:--:--</span>
+        </header>
+
+        <pre class="ascii-sparkle dim" aria-hidden="true">     *  .   ·    *      ·  .  *   ·       .</pre>
+
+<pre class="ascii-art" role="img" aria-label="100">
+ ██╗  ██████╗  ██████╗
+███║ ██╔═══██╗██╔═══██╗
+╚██║ ██║   ██║██║   ██║
+ ██║ ██║   ██║██║   ██║
+ ██║ ╚██████╔╝╚██████╔╝
+ ╚═╝  ╚═════╝  ╚═════╝
+</pre>
+
+        <pre class="ascii-sparkle dim" aria-hidden="true">   ·     *   .  ·    *      .   ·  *    .</pre>
+
+        <p class="splash-tagline center bright" id="tagline">&nbsp;</p>
+        <p class="splash-sub center dim" id="subline">&nbsp;</p>
+
+        <p class="continue-prompt center" id="continue-prompt" style="visibility: hidden;">
+          <span>&gt; press any key to continue</span><span class="cursor"></span>
+        </p>
+
+        <footer class="screen-footer">
+          <span>limbic-system v1.0.0</span>
+          <span id="status-field">booting<span class="cursor"></span></span>
+        </footer>
+      </main>
+    </div>
+
+    <script src="./assets/js/terminal.js"></script>
+    <script>
+      (function () {
+        const T = window.Terminal;
+
+        // Live clock
+        const clock = document.getElementById("clock");
+        const pad = (n) => String(n).padStart(2, "0");
+        function tick() {
+          const d = new Date();
+          clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+        tick();
+        setInterval(tick, 1000);
+
+        const tagline = document.getElementById("tagline");
+        const subline = document.getElementById("subline");
+        const continuePrompt = document.getElementById("continue-prompt");
+        const statusField = document.getElementById("status-field");
+
+        const NEXT = "./number/";
+
+        let ready = false;
+        let typeRun = null;
+
+        function goNext() {
+          window.location.href = NEXT;
+        }
+
+        async function runIntro() {
+          // Subtle reveal so the splash feels alive without being slow
+          typeRun = T.typewriter(tagline, "★  ONE HUNDRED NUMBERS, ONE HUNDRED MEMORIES  ★", { speed: 18 });
+          await typeRun.promise;
+          await new Promise((r) => setTimeout(r, 150));
+          typeRun = T.typewriter(subline, "pick a number, watch how they meet and love.", { speed: 14 });
+          await typeRun.promise;
+          typeRun = null;
+
+          statusField.innerHTML = 'READY<span class="cursor"></span>';
+          continuePrompt.style.visibility = "visible";
+          ready = true;
+        }
+
+        function handleAdvance(e) {
+          if (typeRun) {
+            // First interaction skips intro typing
+            typeRun.skip();
+            return;
+          }
+          if (!ready) return;
+          // Ignore modifier-only keypresses
+          if (e && e.type === "keydown") {
+            if (["Shift", "Control", "Alt", "Meta", "Tab"].includes(e.key)) return;
+          }
+          goNext();
+        }
+
+        document.addEventListener("keydown", handleAdvance);
+        document.addEventListener("click", handleAdvance);
+        document.addEventListener("touchstart", handleAdvance, { passive: true });
+
+        runIntro();
+      })();
+    </script>
+  </body>
+</html>

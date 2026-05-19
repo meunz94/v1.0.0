@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>limbic-system v1.0.0</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
+    <link rel="stylesheet" href="../assets/css/common.css" />
+    <link rel="stylesheet" href="../assets/css/terminal.css" />
+  </head>
+  <body>
+    <div class="viewport">
+      <main class="screen" role="main">
+        <header class="screen-header">
+          <span>limbic-system / 100 of memories</span>
+          <span class="dim" id="status-field">booting</span>
+        </header>
+
+        <!-- BOOT + LOADING -->
+        <section id="screen-boot">
+          <div class="boot-log" id="boot-log"></div>
+          <div class="loading-bar" id="loading-bar"></div>
+        </section>
+
+        <!-- MAIN APP -->
+        <section id="screen-app" class="hidden">
+          <div class="tv-layout">
+            <!-- Controls panel: dial + buttons. On mobile this stacks above
+                 the screen (natural source order). On desktop CSS swaps it
+                 to the right column. -->
+            <aside class="tv-controls">
+              <div class="dial-block">
+                <div class="odometer" id="odometer" aria-hidden="true">
+                  <div class="digit-col"><div class="digit-strip" id="d-hundreds"></div></div>
+                  <div class="digit-col"><div class="digit-strip" id="d-tens"></div></div>
+                  <div class="digit-col"><div class="digit-strip" id="d-ones"></div></div>
+                </div>
+
+                <div class="dial-wrap">
+                  <svg class="dial"
+                       id="dial"
+                       viewBox="-100 -100 200 200"
+                       role="slider"
+                       tabindex="0"
+                       aria-label="1과 100 사이 숫자 선택"
+                       aria-valuemin="1"
+                       aria-valuemax="100"
+                       aria-valuenow="1">
+                    <circle class="dial-outer" r="92" />
+                    <g class="dial-ticks" id="dial-ticks"></g>
+                    <g class="dial-rotator" id="dial-rotator">
+                      <circle class="dial-inner" r="64" />
+                      <circle class="dial-notch" cx="0" cy="-50" r="6" />
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="actions center-actions">
+                <div class="nav-cluster">
+                  <button id="btn-prev" class="btn-icon hidden" aria-label="이전 숫자">◀</button>
+                  <button id="btn-submit" class="btn-icon" aria-label="현재 숫자 재생">●</button>
+                  <button id="btn-next" class="btn-icon hidden" aria-label="다음 숫자">▶</button>
+                </div>
+                <button id="btn-random" class="btn-icon btn-random" aria-label="랜덤 숫자">★</button>
+              </div>
+            </aside>
+
+            <!-- Screen panel: result frame styled like a CRT TV screen. -->
+            <div class="tv-screen">
+              <div class="tv-empty" id="tv-empty">
+                <p class="dim">&gt; awaiting signal...</p>
+                <p class="dim">&gt; turn the dial and press <span class="bright">●</span>.</p>
+                <p class="dim">&gt; or, you can enjoy randomness with <span class="bright">★</span>.</p>
+              </div>
+              <div class="result-box hidden" id="result-box">
+                <div class="result-header" id="result-header"></div>
+                <div class="result-body" id="result-body"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="screen-footer">
+          <span id="footer-info">v1.0.0</span>
+          <span>romance-overclock<span class="cursor"></span></span>
+        </footer>
+      </main>
+    </div>
+
+    <script src="../assets/js/terminal.js"></script>
+    <script src="../assets/js/number.js"></script>
+  </body>
+</html>
