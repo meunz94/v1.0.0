@@ -139,8 +139,8 @@
     const lines = [
       { text: "[ limbic-system / 100 of memories ]", className: "bright", delayAfter: 220 },
       { text: "> initializing system........... OK", className: "ok", delayAfter: 140 },
-      { text: "> mounting /data/numbers/....... OK", className: "ok", delayAfter: 140 },
-      { text: "> calibrating dial.............. OK", className: "ok", delayAfter: 140 },
+      { text: "> mounting all memories......... OK", className: "ok", delayAfter: 140 },
+      { text: "> calibrating pulse............. OK", className: "ok", delayAfter: 140 },
       { text: "> ready.", className: "ok", delayAfter: 280 },
     ];
     return T.typewriterLines(bootLog, lines, { speed: 10, delayAfter: 140 });
